@@ -2,31 +2,29 @@ package me.ichun.letsleepingdogslie.common;
 
 import me.ichun.letsleepingdogslie.client.core.EventHandler;
 import me.ichun.letsleepingdogslie.client.model.WolfModel;
+import me.shedaniel.autoconfig.AutoConfig;
+import me.shedaniel.autoconfig.serializer.GsonConfigSerializer;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.networking.v1.ClientLoginConnectionEvents;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.WolfRenderer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.fml.IExtensionPoint;
-import net.minecraftforge.fml.ModList;
-import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fmllegacy.network.FMLNetworkConstants;
+import net.minecraft.world.entity.animal.Wolf;
 import org.apache.logging.log4j.*;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-@Mod(LetSleepingDogsLie.MOD_ID)
-public class LetSleepingDogsLie
+public class LetSleepingDogsLie implements ModInitializer
 {
     public static final String MOD_ID = "dogslie";
     public static final String MOD_NAME = "Let Sleeping Dogs Lie";
@@ -35,10 +33,11 @@ public class LetSleepingDogsLie
     private static final Marker INIT = MarkerManager.getMarker("Init");
     private static final Marker MOD_WOLF_SUPPORT = MarkerManager.getMarker("ModWolfSupport");
 
-    public static Config config;
+    public static LetSleepingDogsLieConfig config;
     public static EventHandler eventHandler;
+    public static String currentPose;
 
-    public LetSleepingDogsLie()
+    /*public LetSleepingDogsLie()
     {
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
             setupConfig();
@@ -59,35 +58,24 @@ public class LetSleepingDogsLie
 
         //register the config. This loads the config for us
         ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, configBuilder.build(), MOD_ID + ".toml");
-    }
+    }*/
 
 
     private boolean hasLoadingGui = false;
-    @OnlyIn(Dist.CLIENT)
-    private void onClientTick(TickEvent.ClientTickEvent event)
-    {
-        if(event.phase == TickEvent.Phase.END)
-        {
-            if(Minecraft.getInstance().getOverlay() == null && hasLoadingGui)
-            {
-                injectWolfModel();
-            }
-            hasLoadingGui = Minecraft.getInstance().getOverlay() != null;
-        }
-    }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     private void injectWolfModel()
     {
-        if(ModList.get().isLoaded("doggytalents"))
+        /*if(FabricLoader.getInstance().isModLoaded("doggytalents"))
         {
             LOGGER.error(INIT, "Detected Doggy Talents installed, they have their own lying down mechanic, meaning we're incompatible with them, so we won't do anything!");
             return;
-        }
+        }*/
 
         boolean replaced = false;
 
-        if(config.attemptModWolfSupport.get())
+        //TODO: add this
+        if(config.attemptModWolfSupport)
         {
             Map<EntityType<?>, EntityRenderer<?>> renderers = Minecraft.getInstance().getEntityRenderDispatcher().renderers;
             for(Map.Entry<EntityType<?>, EntityRenderer<? extends Entity >> e : renderers.entrySet())
@@ -125,8 +113,28 @@ public class LetSleepingDogsLie
 
         if(replaced)
         {
-            MinecraftForge.EVENT_BUS.register(eventHandler = new EventHandler());
+
         }
+    }
+
+    @Override
+    public void onInitialize() {
+        eventHandler = new EventHandler();
+        AutoConfig.register(LetSleepingDogsLieConfig.class, GsonConfigSerializer::new);
+        this.config = AutoConfig.getConfigHolder(LetSleepingDogsLieConfig.class).getConfig();
+        ClientTickEvents.END_CLIENT_TICK.register((client -> {
+            if (client.getOverlay() == null && hasLoadingGui) {
+                injectWolfModel();
+            }
+            hasLoadingGui = client.getOverlay() != null;
+            eventHandler.onClientTick();
+        }));
+        ClientEntityEvents.ENTITY_LOAD.register((entity, level) -> {
+            if (entity instanceof Wolf wolf)
+            eventHandler.onEntityJoinWorld(wolf);
+        });
+        ClientLoginConnectionEvents.DISCONNECT.register((handler, client) -> eventHandler.clean());
+        ClientPlayConnectionEvents.JOIN.register((handler, client, thing) -> eventHandler.clean());
     }
 
     public enum GetsUpFor
@@ -137,7 +145,7 @@ public class LetSleepingDogsLie
         ANY_LIVING_ENTITY
     }
 
-    public class Config
+    /*public class Config
     {
         public final ForgeConfigSpec.BooleanValue dogsSpawnLying;
         public final ForgeConfigSpec.IntValue timeBeforeLie;
@@ -184,5 +192,5 @@ public class LetSleepingDogsLie
 
             builder.pop();
         }
-    }
+    }*/
 }
