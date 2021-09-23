@@ -1,0 +1,19 @@
+accessWidener	v1	named
+
+accessible class net/minecraft/client/model/WolfModel
+
+accessible field net/minecraft/client/renderer/entity/LivingEntityRenderer model Lnet/minecraft/client/model/EntityModel;
+accessible field net/minecraft/client/model/geom/ModelPart cubes Ljava/util/List;
+
+accessible field net/minecraft/client/model/WolfModel rightFrontLeg Lnet/minecraft/client/model/geom/ModelPart;
+accessible field net/minecraft/client/model/WolfModel leftFrontLeg Lnet/minecraft/client/model/geom/ModelPart;
+accessible field net/minecraft/client/model/WolfModel rightHindLeg Lnet/minecraft/client/model/geom/ModelPart;
+accessible field net/minecraft/client/model/WolfModel leftHindLeg Lnet/minecraft/client/model/geom/ModelPart;
+accessible field net/minecraft/client/model/WolfModel head Lnet/minecraft/client/model/geom/ModelPart;
+accessible field net/minecraft/client/model/WolfModel realHead Lnet/minecraft/client/model/geom/ModelPart;
+accessible field net/minecraft/client/model/WolfModel body Lnet/minecraft/client/model/geom/ModelPart;
+accessible field net/minecraft/client/model/WolfModel tail Lnet/minecraft/client/model/geom/ModelPart;
+accessible field net/minecraft/client/model/WolfModel realTail Lnet/minecraft/client/model/geom/ModelPart;
+accessible field net/minecraft/client/model/WolfModel upperBody Lnet/minecraft/client/model/geom/ModelPart;
+
+accessible field net/minecraft/client/renderer/entity/EntityRenderDispatcher renderers Ljava/util/Map;

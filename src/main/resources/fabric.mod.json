@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "id": "letsleepingdogslie",
+  "version": "${version}",
+
+  "name": "Let Sleeping Dogs Lie",
+  "description": "Lets dogs that have been left sitting down too long to actually lie down and get some rest.",
+  "authors": [
+    "iChun"
+  ],
+  "contact": {
+    "homepage": "https://ichun.me/",
+    "sources": "https://github.com/IMS212/LetSleepingDogsLie-Fabric/",
+    "issues": "https://github.com/IMS212/LetSleepingDogsLie-Fabric/issues/"
+  },
+
+  "license": "LGPLv3",
+  "icon": "assets/dogslie/icon.png",
+  "accessWidener" : "dogslie.accesswidener",
+
+  "environment": "client",
+  "entrypoints": {
+    "main": [
+      "me.ichun.letsleepingdogslie.common.LetSleepingDogsLie"
+    ],
+    "modmenu": [
+      "me.ichun.letsleepingdogslie.ModMenuIntegration"
+    ]
+  },
+
+  "depends": {
+    "fabricloader": ">=0.11.3",
+    "fabric": "*",
+    "minecraft": ">=1.17",
+    "java": ">=16",
+    "cloth-config2": "5.x"
+  }
+}
